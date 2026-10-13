@@ -1,0 +1,40 @@
+[tasks.build_run]
+alias = "qsw"
+depends = ["run"]
+
+[tasks.configure]
+hide = True
+dir = "{{cwd}}"
+description = "Generates CMake build files and fixes Zed IDE include errors"
+run = """
+cmake -B build -S .
+"""
+# ln -sf build/compile_commands.json .
+
+[tasks.build]
+alias = "qs"
+dir = "{{cwd}}"
+description = "Compiles the project using all available CPU cores"
+depends = ["configure"]
+run = "cmake --build build --parallel"
+
+[tasks.run]
+alias = "qw"
+dir = "{{cwd}}"
+description = "Builds and runs the project instantly"
+depends = ["build"]
+run = """./build/$(basename "{{cwd}}")"""
+
+[tasks.debug]
+alias = "qa"
+dir = "{{cwd}}"
+description = "Builds and launches the project inside the GDB debugger"
+depends = ["build"]
+run = """gdb -q ./build/$(basename "{{cwd}}")"""
+
+[tasks.clean]
+hide = True
+alias = "qz"
+dir = "{{cwd}}"
+description = "Deletes all build artifacts"
+run = "rm -rf build compile_commands.json"
